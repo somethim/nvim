@@ -37,17 +37,12 @@ return {
               },
             },
           },
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>Gb", function() Snacks.terminal("go build ./...", { id = "go:build", cwd = vim.fn.getcwd() }) end, "Go: Build")
-            map("<leader>Gr", function() Snacks.terminal("go run .",      { id = "go:run",   cwd = vim.fn.getcwd() }) end, "Go: Run")
-            map("<leader>Gt", function() Snacks.terminal("go test ./...", { id = "go:test",  cwd = vim.fn.getcwd() }) end, "Go: Test All")
-            map("<leader>Gi", function()
-              vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } })
-            end, "Go: Organize Imports")
-          end,
+          keys = {
+            { "<leader>Gb", function() Snacks.terminal("go build ./...", { id = "go:build", cwd = vim.fn.getcwd() }) end, desc = "Go: Build" },
+            { "<leader>Gr", function() Snacks.terminal("go run .",      { id = "go:run",   cwd = vim.fn.getcwd() }) end, desc = "Go: Run" },
+            { "<leader>Gt", function() Snacks.terminal("go test ./...", { id = "go:test",  cwd = vim.fn.getcwd() }) end, desc = "Go: Test All" },
+            { "<leader>Gi", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } }) end, desc = "Go: Organize Imports" },
+          },
         },
       },
     },

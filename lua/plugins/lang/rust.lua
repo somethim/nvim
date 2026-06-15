@@ -13,6 +13,13 @@ return {
       opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
         rust = { "rustfmt" },
       })
+      -- conform's builtin rustfmt defaults to edition 2015, which fails to parse
+      -- modern syntax (async, etc.) and silently aborts formatting. Pin the edition.
+      opts.formatters = vim.tbl_deep_extend("force", opts.formatters or {}, {
+        rustfmt = {
+          prepend_args = { "--edition=2021" },
+        },
+      })
     end,
   },
 

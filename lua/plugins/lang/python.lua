@@ -22,16 +22,11 @@ return {
   -- any local mypy.ini / pyproject.toml [mypy] / setup.cfg takes precedence
   {
     "mfussenegger/nvim-lint",
-    event = { "BufWritePost", "BufReadPost" },
-    config = function()
-      local lint = require("lint")
-      lint.linters_by_ft = vim.tbl_extend("force", lint.linters_by_ft or {}, {
+    opts = {
+      linters_by_ft = {
         python = { "mypy" },
-      })
-      vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
-        callback = function() lint.try_lint() end,
-      })
-    end,
+      },
+    },
   },
 
   -- Python DAP via debugpy
@@ -58,15 +53,10 @@ return {
     opts = {
       servers = {
         pyright = {
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>Po", function()
-              vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } })
-            end, "Py: Organize Imports")
-            map("<leader>Pr", "<cmd>PyrightRestartServer<cr>", "Py: Restart Pyright")
-          end,
+          keys = {
+            { "<leader>Po", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } }) end, desc = "Py: Organize Imports" },
+            { "<leader>Pr", "<cmd>PyrightRestartServer<cr>", desc = "Py: Restart Pyright" },
+          },
         },
       },
     },

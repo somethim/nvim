@@ -20,14 +20,11 @@ return {
     opts = {
       servers = {
         clangd = {
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>", "C: Switch Header/Source")
-            map("<leader>ci", "<cmd>ClangdSymbolInfo<cr>",          "C: Symbol Info")
-            map("<leader>ct", "<cmd>ClangdTypeHierarchy<cr>",       "C: Type Hierarchy")
-          end,
+          keys = {
+            { "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "C: Switch Header/Source" },
+            { "<leader>ci", "<cmd>ClangdSymbolInfo<cr>",         desc = "C: Symbol Info" },
+            { "<leader>ct", "<cmd>ClangdTypeHierarchy<cr>",      desc = "C: Type Hierarchy" },
+          },
         },
       },
     },

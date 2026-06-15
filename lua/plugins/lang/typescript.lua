@@ -24,19 +24,14 @@ return {
 
   {
     "mfussenegger/nvim-lint",
-    event = { "BufWritePost", "BufReadPost" },
-    config = function()
-      local lint = require("lint")
-      lint.linters_by_ft = vim.tbl_extend("force", lint.linters_by_ft or {}, {
+    opts = {
+      linters_by_ft = {
         typescript = { "eslint_d" },
         typescriptreact = { "eslint_d" },
         javascript = { "eslint_d" },
         javascriptreact = { "eslint_d" },
-      })
-      vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
-        callback = function() lint.try_lint() end,
-      })
-    end,
+      },
+    },
   },
 
   {
@@ -55,17 +50,10 @@ return {
               },
             },
           },
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>To", function()
-              vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } })
-            end, "TS: Organize Imports")
-            map("<leader>Tr", function()
-              vim.lsp.buf.code_action({ apply = true, context = { only = { "source.removeUnused" } } })
-            end, "TS: Remove Unused")
-          end,
+          keys = {
+            { "<leader>To", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" } } }) end, desc = "TS: Organize Imports" },
+            { "<leader>Tr", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.removeUnused" } } }) end, desc = "TS: Remove Unused" },
+          },
         },
       },
     },

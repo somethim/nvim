@@ -30,16 +30,13 @@ return {
               warn_style = true,
             },
           },
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            -- run build / test / run via terminal (zig has no DAP adapter yet)
-            map("<leader>zb", function() Snacks.terminal("zig build",                                    { id = "zig:build", cwd = vim.fn.getcwd() }) end, "Zig: Build")
-            map("<leader>zt", function() Snacks.terminal("zig build test",                               { id = "zig:test",  cwd = vim.fn.getcwd() }) end, "Zig: Test")
-            map("<leader>zr", function() Snacks.terminal("zig run " .. vim.fn.expand("%:p"),             { id = "zig:run",   cwd = vim.fn.getcwd() }) end, "Zig: Run File")
-            map("<leader>zf", function() Snacks.terminal("zig fmt " .. vim.fn.expand("%:p"),             { id = "zig:fmt",   cwd = vim.fn.getcwd() }) end, "Zig: Fmt File")
-          end,
+          -- run build / test / run via terminal (zig has no DAP adapter yet)
+          keys = {
+            { "<leader>zb", function() Snacks.terminal("zig build",                        { id = "zig:build", cwd = vim.fn.getcwd() }) end, desc = "Zig: Build" },
+            { "<leader>zt", function() Snacks.terminal("zig build test",                   { id = "zig:test",  cwd = vim.fn.getcwd() }) end, desc = "Zig: Test" },
+            { "<leader>zr", function() Snacks.terminal("zig run " .. vim.fn.expand("%:p"), { id = "zig:run",   cwd = vim.fn.getcwd() }) end, desc = "Zig: Run File" },
+            { "<leader>zf", function() Snacks.terminal("zig fmt " .. vim.fn.expand("%:p"), { id = "zig:fmt",   cwd = vim.fn.getcwd() }) end, desc = "Zig: Fmt File" },
+          },
         },
       },
     },

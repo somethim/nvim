@@ -21,19 +21,23 @@ return {
           { "<leader>Da", "<cmd>DBUIAddConnection<cr>", desc = "DB: Add Connection" },
         },
       },
-      {
-        "kristijanhusak/vim-dadbod-completion",
-        ft = { "sql", "mysql", "plsql" },
-        config = function()
-          vim.api.nvim_create_autocmd("FileType", {
-            pattern = { "sql", "mysql", "plsql" },
-            callback = function()
-              require("cmp").setup.buffer({
-                sources = { { name = "vim-dadbod-completion" } },
-              })
-            end,
-          })
-        end,
+      { "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" } },
+    },
+  },
+
+  -- Register dadbod as a blink.cmp source for SQL buffers (LazyVim uses blink.cmp)
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        per_filetype = {
+          sql = { "dadbod", "snippets", "buffer" },
+          mysql = { "dadbod", "snippets", "buffer" },
+          plsql = { "dadbod", "snippets", "buffer" },
+        },
+        providers = {
+          dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
+        },
       },
     },
   },

@@ -21,21 +21,17 @@ return {
   },
 
   -- Linting for Dockerfile, Ansible, Terraform, YAML
+  -- (LazyVim's nvim-lint core already wires the lint autocmd)
   {
     "mfussenegger/nvim-lint",
-    event = { "BufWritePost", "BufReadPost" },
-    config = function()
-      local lint = require("lint")
-      lint.linters_by_ft = vim.tbl_extend("force", lint.linters_by_ft or {}, {
+    opts = {
+      linters_by_ft = {
         dockerfile = { "hadolint" },
         yaml       = { "yamllint" },
         ansible    = { "ansible_lint" },
         terraform  = { "tflint" },
-      })
-      vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave" }, {
-        callback = function() lint.try_lint() end,
-      })
-    end,
+      },
+    },
   },
 
   -- Terraform keymaps
@@ -44,15 +40,12 @@ return {
     opts = {
       servers = {
         terraformls = {
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>Tf", "<cmd>!terraform fmt %<cr>",       "TF: Format File")
-            map("<leader>Ti", "<cmd>!terraform init<cr>",        "TF: Init")
-            map("<leader>Tv", "<cmd>!terraform validate<cr>",    "TF: Validate")
-            map("<leader>Tp", "<cmd>!terraform plan<cr>",        "TF: Plan")
-          end,
+          keys = {
+            { "<leader>Tf", "<cmd>!terraform fmt %<cr>",    desc = "TF: Format File" },
+            { "<leader>Ti", "<cmd>!terraform init<cr>",     desc = "TF: Init" },
+            { "<leader>Tv", "<cmd>!terraform validate<cr>", desc = "TF: Validate" },
+            { "<leader>Tp", "<cmd>!terraform plan<cr>",     desc = "TF: Plan" },
+          },
         },
       },
     },

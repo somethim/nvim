@@ -42,14 +42,9 @@ return {
               files = { maxSize = 5000000 },
             },
           },
-          on_attach = function(_, bufnr)
-            local map = function(keys, cmd, desc)
-              vim.keymap.set("n", keys, cmd, { buffer = bufnr, desc = desc })
-            end
-            map("<leader>La", function()
-              vim.lsp.buf.code_action()
-            end, "PHP: Code Actions")
-          end,
+          keys = {
+            { "<leader>La", function() vim.lsp.buf.code_action() end, desc = "PHP: Code Actions" },
+          },
         },
       },
     },
