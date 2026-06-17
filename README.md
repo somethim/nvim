@@ -12,7 +12,7 @@ Built on [LazyVim](https://lazyvim.github.io). Theme is managed by [Omarchy](htt
 | **Rust** | rust-analyzer | rustfmt | Clippy (pedantic), codelldb DAP |
 | **Python** | pyright | black | mypy, debugpy DAP |
 | **TypeScript / JS** | vtsls | prettierd | eslint_d |
-| **PHP / Laravel** | intelephense | php-cs-fixer | Laravel stubs |
+| **PHP / Laravel** | intelephense | pint (php-cs-fixer fallback) | Laravel stubs |
 | **C / C++** | clangd | clang-format | GDB DAP |
 | **Zig** | zls | zigfmt | — |
 | **Terraform** | terraform-ls | terraform fmt | tflint |
@@ -38,16 +38,18 @@ Built on [LazyVim](https://lazyvim.github.io). Theme is managed by [Omarchy](htt
 | `<leader>Gd` | Debug test under cursor |
 | `<leader>Gl` | Debug last test |
 
-### Rust  `<leader>r`
+### Rust  `<leader>R`
+Diagnostics come from **bacon-ls** (real-time `cargo clippy` with `-D clippy::pedantic -D clippy::nursery`), not rust-analyzer's checkOnSave. Squiggles update as you type. A per-crate `Cargo.toml` `[lints.clippy]` block overrides the global pedantic/nursery flags. Apply a clippy fix with **Alt+Enter** on the warning line.
+
 | Key | Action |
 |---|---|
-| `<leader>rr` | Runnables |
-| `<leader>rd` | Debuggables |
-| `<leader>rt` | Testables |
-| `<leader>re` | Expand macro |
-| `<leader>rc` | Open Cargo.toml |
-| `<leader>rp` | Parent module |
-| `<leader>rh` | Hover actions |
+| `<leader>Rr` | Runnables |
+| `<leader>Rd` | Debuggables |
+| `<leader>Rt` | Testables |
+| `<leader>Re` | Expand macro |
+| `<leader>Rc` | Open Cargo.toml |
+| `<leader>Rp` | Parent module |
+| `<leader>Rh` | Hover actions |
 | `K` | Hover docs |
 
 ### Python  `<leader>P`
@@ -176,7 +178,9 @@ Live preview of rename as you type. Replaces the default `<leader>cr`.
 | `gI` | Go to implementation |
 | `gy` | Go to type definition |
 | `K` | Hover docs |
-| `<leader>ca` | Code actions |
+| `<M-CR>` (Alt+Enter) | **Context menu / intentions** — quick-fixes, imports, refactors (JetBrains-style) |
+| `<leader>ca` | Code actions (same menu) |
+| `<leader>cq` | Auto-apply the quick-fix under the cursor |
 | `<leader>cr` | Rename symbol (live preview) |
 | `<leader>cf` | Format file |
 | `[d` / `]d` | Previous / next diagnostic |
@@ -221,6 +225,63 @@ Live preview of rename as you type. Replaces the default `<leader>cr`.
 | `<S-h>` / `<S-l>` | Previous / next buffer |
 | `<leader>bd` | Delete buffer |
 | `<leader>bo` | Delete other buffers |
+
+---
+
+## Power Editing Cheatsheet
+
+Things that are easy to forget but save a ton of time.
+
+### Context menu / "do something here"  (JetBrains Alt+Enter)
+| Key | Action |
+|---|---|
+| `<M-CR>` (Alt+Enter) | Open the action menu under the cursor — quick-fix, import, refactor, generate. Works in normal, visual **and** insert mode, in every language with an LSP. |
+| `<leader>cq` | Skip the menu — auto-apply the obvious quick-fix for the diagnostic on the current line. |
+
+If your terminal eats Alt+Enter, use `<leader>ca` (code actions) or `<leader>cq` instead.
+
+### Edit many places at once (multi-cursor-style)
+No multi-cursor plugin needed — these are native and faster once they click.
+
+| Keys | What it does |
+|---|---|
+| `<C-v>` → move down → `I` text `<Esc>` | **Visual block insert**: type on the front of many lines at once (e.g. prefix a column). |
+| `<C-v>` → move down → `A` text `<Esc>` | Same, but append after the selection on every line. |
+| `<C-v>` → select block → `c` text `<Esc>` | Replace a column/block on every selected line simultaneously. |
+| `<C-v>` → select block → `d` / `x` | Delete a vertical block (great for stripping a column). |
+| `*` then `cgn` text `<Esc>`, then `.` `.` `.` | Change the word under the cursor, then hit `.` to repeat the change on each next occurrence — pseudo multi-cursor with confirmation. |
+| `:%s/old/new/g` | Replace everywhere; add `c` (`/gc`) to confirm each. |
+| `:%s/old/new/gc` over a visual range with `:'<,'>s/...` | Replace only inside the selection. |
+
+### Comment many lines at once
+| Keys | What it does |
+|---|---|
+| `gcc` | Toggle comment on the current line. |
+| `gc` + motion | Comment a motion — e.g. `gcap` (paragraph), `gc3j` (3 lines down), `gcG` (to EOF). |
+| Visual select → `gc` | Comment every selected line. `<C-v>`/`V` first, then `gc`. |
+| `gco` / `gcO` | Add a comment line below / above and enter insert. |
+
+### Jumping & motion
+| Keys | What it does |
+|---|---|
+| `s` + 2 chars | **flash.nvim** — jump anywhere on screen by typing 2 chars of the target. |
+| `$` / `0` / `^` | End of line / first column / first non-blank of line. |
+| `A` | Jump to **EOL and enter insert** (append at end of line). `I` does the same at line start. |
+| `G` / `gg` | End of file / top of file. |
+| `<C-d>` / `<C-u>` | Half-page down / up. |
+| `}` / `{` | Next / previous blank-line paragraph. |
+| `%` | Jump to the matching bracket/paren/brace. |
+| `ciw` / `ci"` / `ci(` | Change inner word / inside quotes / inside parens (mini.ai extends these). |
+| `f<char>` / `t<char>` | Jump to / just-before the next `<char>` on the line; `;` repeats. |
+
+### Misc time-savers
+| Keys | What it does |
+|---|---|
+| `.` | Repeat the last change — the most underused key in vim. |
+| `<C-o>` / `<C-i>` | Jump back / forward through your cursor-position history. |
+| `qa` … `q` then `@a` | Record a macro into register `a`, replay with `@a`, `@@` to repeat. |
+| `>>` / `<<` | Indent / dedent line; `=` re-indents a motion (`=ap`, `=G`). |
+| `:earlier 5m` / `:later 5m` | Time-travel the undo tree. |
 
 ---
 

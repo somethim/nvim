@@ -4,8 +4,10 @@ return {
     opts = function(_, opts)
       opts.ensure_installed = opts.ensure_installed or {}
       -- intelephense: PHP LSP with Laravel stubs support
-      -- php-cs-fixer: formatter (PSR-12 / Laravel style)
-      vim.list_extend(opts.ensure_installed, { "intelephense", "php-cs-fixer" })
+      -- pint: Laravel's opinionated code style fixer (built on php-cs-fixer).
+      --       Installed globally as a fallback; a project's vendor/bin/pint is
+      --       preferred automatically when present.
+      vim.list_extend(opts.ensure_installed, { "intelephense", "pint" })
     end,
   },
 
@@ -13,8 +15,17 @@ return {
     "stevearc/conform.nvim",
     opts = function(_, opts)
       opts.formatters_by_ft = vim.tbl_extend("force", opts.formatters_by_ft or {}, {
-        php = { "php_cs_fixer" },
+        php = { "pint" },
         blade = { "blade-formatter" },
+      })
+      -- Pint uses the Laravel preset by default and automatically picks up a
+      -- pint.json from the project root when one exists. Run it from the
+      -- composer/pint root so the project-local pint.json and vendor/bin/pint
+      -- resolve correctly (falls back to the global pint + Laravel preset).
+      opts.formatters = vim.tbl_deep_extend("force", opts.formatters or {}, {
+        pint = {
+          cwd = require("conform.util").root_file({ "composer.json", "pint.json" }),
+        },
       })
     end,
   },
@@ -23,6 +34,11 @@ return {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
+        -- The LazyVim php extra also starts phpactor, which would attach to PHP
+        -- buffers alongside intelephense and double up diagnostics. intelephense
+        -- has the stricter analysis (undefined symbols, type checks, unused code,
+        -- Laravel stubs), so keep it and turn phpactor off.
+        phpactor = { enabled = false },
         intelephense = {
           settings = {
             intelephense = {
